@@ -1,11 +1,11 @@
-public class Apple{
-
+public abstract class FixedGameElement
+{
+    //classe abstraite --> classe ne pouvant pas être instanciée
+    // regroupe les éléments en communs des classes
     private int pos_x;
     private int pos_y;
-    
-    private static String pathToImage = "apple.png"; 
-    
-    public Apple(int pos_x, int pos_y) {
+
+    public FixedGameElement(int pos_x, int pos_y) {
         
         this.pos_x = pos_x ;
         this.pos_y = pos_y ;
@@ -27,8 +27,9 @@ public class Apple{
     public void setPosY(int new_pos){
         pos_y = new_pos;
     }
-    
-    public static String getPathToImage(){
-        return pathToImage;
-    }
+
+    public abstract String getType();
+
+    public abstract void triggerAction(Board board);
+
 }

@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -25,8 +26,10 @@ public class Board extends JPanel implements ActionListener {
     private int pos_x;
     private int pos_y;
     
-    private int appleCounter;
-    private ArrayList<Apple> appleList ;
+    private int coinCounter;
+    private int insectCounter;
+    //private ArrayList<Coin> coinList ;
+    private ArrayList<FixedGameElement> fixedGameElementList;
 
     private boolean leftDirection = false;
     private boolean rightDirection = false;
@@ -36,8 +39,15 @@ public class Board extends JPanel implements ActionListener {
 
     private Timer timer;
 
-    private Image appleImage;
+    private Image coinImage;
+    private Image insectImage;
     private Image head;
+
+    private HashMap<String, ImageIcon> fixedGameElementImageMap;
+
+    private int score;
+    private int void_x = -1 * B_WIDTH; //position du "vide"
+    private int void_y = -1 * B_HEIGHT; //je vais y mettre les objets que je souhaite faire disparaitre
 
     public Board() {
         
@@ -57,30 +67,43 @@ public class Board extends JPanel implements ActionListener {
 
     private void loadImages() {
 
-        ImageIcon iia = new ImageIcon(Apple.getPathToImage()); //image de la pomme (voir dans Apple.java)
-        appleImage = iia.getImage();
+        fixedGameElementImageMap = new HashMap<String, ImageIcon>();
+
+        ImageIcon iic = new ImageIcon(Coin.getPathToImage()); //image du coin
+        //coinImage = iic.getImage();
+        fixedGameElementImageMap.put("coin", iic); //je n'utilise pas la méthode getType() car ce n'est pas une classe static
+
+        ImageIcon iii = new ImageIcon(Insect.getPathToImage()); //image de la pomme (voir dans Apple.java)
+        //insectImage = iii.getImage();
+        fixedGameElementImageMap.put("insect", iii);
 
         ImageIcon iih = new ImageIcon("head.png");
         head = iih.getImage();
     }
 
     private void initGame() {
-        
+
+        score = 0; // le score est égal à 0 à l'initialisation du jeu
+
         pos_x = B_WIDTH/2;
         pos_y = B_HEIGHT/2;
         
-        appleCounter = 3; //nombre de pommes
-        appleList = new ArrayList<Apple>();
+        coinCounter = 3; //nombre de pommes
+        insectCounter = 2; // 2 insectes au début du jeu
+        fixedGameElementList = new ArrayList<FixedGameElement>();
         
-        int apple_x;
-        int apple_y;
+        int coin_x;
+        int coin_y;
 
         //---PLACEMENT ALEATOIRE DES 3 POMMES----//
-        for(int i = 0; i < appleCounter ; i++){
-            apple_x = getRandomCoordinate();
-            apple_y = getRandomCoordinate();
-            appleList.add(new Apple(apple_x, apple_y)); //ajout dans la liste de Apple
+        for(int i = 0; i < coinCounter ; i++){
+            fixedGameElementList.add(new Coin(getRandomCoordinate(), getRandomCoordinate()));
         }
+
+        for(int i = 0; i < insectCounter ; i++){
+            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate()));
+        }
+
         //---FIN PLACEMENT ALEATOIRE DES 3 POMMES----//
 
         timer = new Timer(DELAY, this);
@@ -98,8 +121,8 @@ public class Board extends JPanel implements ActionListener {
         
         if (inGame) {
 
-            for(Apple app: appleList){ //on affiche les pommes
-                g.drawImage(appleImage, app.getPosX(), app.getPosY(), this);
+            for(FixedGameElement elem: fixedGameElementList){ //on affiche les coins
+                g.drawImage(fixedGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
             }      
             
             g.drawImage(head, pos_x, pos_y, this);
@@ -123,14 +146,32 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 
-    private void checkApple() {
+    private void checkGameElementCollision() {
 
-        for(Apple app: appleList){ //on verifie si l'on touche une des 3 pommes en parcourant la liste de pommes
-            if ((pos_x == app.getPosX()) && (pos_y == app.getPosY())){
-                app.setPosX(getRandomCoordinate()); //on genere alors une nouvelle pomme à un nouvel emplacement
-                app.setPosY(getRandomCoordinate()); //on genere alors une nouvelle pomme à un nouvel emplacement
+        for(FixedGameElement elem: fixedGameElementList){
+            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())){
+                elem.setPosX(void_x); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
+                elem.setPosY(void_y); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
+
+                elem.triggerAction(this);
+
+                //score += 1; //le score augemente à chaque fois qu'on attrape une pièce
+                //coinCounter -= 1; //une pièce en moins à chaque pièce mangée
+
+                System.out.println(coinCounter);
+                System.out.println(score);
             }
         }    
+    }
+
+    public void incScore(int valueToIncrease)
+    {
+        score += valueToIncrease;
+    }
+
+    public void decreaseCoinAmount()
+    {
+        coinCounter -= 1;
     }
 
     private void move() {
@@ -186,7 +227,7 @@ public class Board extends JPanel implements ActionListener {
 
         if (inGame) {
 
-            checkApple();
+            checkGameElementCollision();
             checkCollision();
         }
 
