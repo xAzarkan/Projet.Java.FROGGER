@@ -22,12 +22,15 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int RAND_POS = 29;
     private final int DELAY = 140;
+    private final int GAME_BEGINNING_X = B_WIDTH/2;
+    private final int GAME_BEGINNING_Y = B_HEIGHT - DOT_SIZE;
 
     private int pos_x;
     private int pos_y;
     
     private int coinCounter;
     private int insectCounter;
+    private int levelNumber = 1;
     //private ArrayList<Coin> coinList ;
     private ArrayList<FixedGameElement> fixedGameElementList;
 
@@ -36,16 +39,17 @@ public class Board extends JPanel implements ActionListener {
     private boolean upDirection = false;
     private boolean downDirection = false;
     private boolean inGame = true;
+    private boolean nextLevel = false;
 
     private Timer timer;
 
     private Image coinImage;
     private Image insectImage;
-    private Image head;
+    private Image frogImage;
 
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
 
-    private int score;
+    private int score = 0;
     private int void_x = -1 * B_WIDTH; //position du "vide"
     private int void_y = -1 * B_HEIGHT; //je vais y mettre les objets que je souhaite faire disparaitre
 
@@ -77,28 +81,25 @@ public class Board extends JPanel implements ActionListener {
         //insectImage = iii.getImage();
         fixedGameElementImageMap.put("insect", iii);
 
-        ImageIcon iih = new ImageIcon("head.png");
-        head = iih.getImage();
+        ImageIcon iif = new ImageIcon("head.png");
+        frogImage = iif.getImage();
     }
 
     private void initGame() {
 
-        score = 0; // le score est égal à 0 à l'initialisation du jeu
+        pos_x = GAME_BEGINNING_X;
+        pos_y = GAME_BEGINNING_Y;
 
-        pos_x = B_WIDTH/2;
-        pos_y = B_HEIGHT/2;
-        
-        coinCounter = 3; //nombre de pommes
+        coinCounter = 2 + levelNumber; //nombre de coins
         insectCounter = 2; // 2 insectes au début du jeu
         fixedGameElementList = new ArrayList<FixedGameElement>();
-        
-        int coin_x;
-        int coin_y;
 
-        //---PLACEMENT ALEATOIRE DES 3 POMMES----//
+        //---PLACEMENT ALEATOIRE DES 3 COINS----//
         for(int i = 0; i < coinCounter ; i++){
             fixedGameElementList.add(new Coin(getRandomCoordinate(), getRandomCoordinate()));
         }
+
+        //---PLACEMENT ALEATOIRE DES 2 INSECTES---//
 
         for(int i = 0; i < insectCounter ; i++){
             fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate()));
@@ -121,22 +122,39 @@ public class Board extends JPanel implements ActionListener {
         
         if (inGame) {
 
-            for(FixedGameElement elem: fixedGameElementList){ //on affiche les coins
+            if(nextLevel)
+            {
+                goToNextLevel();
+            }
+
+            for (FixedGameElement elem : fixedGameElementList) { //on affiche les coins
                 g.drawImage(fixedGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
-            }      
-            
-            g.drawImage(head, pos_x, pos_y, this);
+            }
+
+            g.drawImage(frogImage, pos_x, pos_y, this);
 
             Toolkit.getDefaultToolkit().sync();
 
-        } else {
 
+        }
+        else {
             gameOver(g);
         }        
     }
 
+    private void goToNextLevel()
+    {
+        System.out.println("Level " + levelNumber + " completed !");
+        System.out.println("Your score : " + score);
+        nextLevel = false;
+        levelNumber += 1;
+        coinCounter = 5;
+        insectCounter = 3;
+        initGame();
+    }
+
     private void gameOver(Graphics g) {
-        
+
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
@@ -196,30 +214,38 @@ public class Board extends JPanel implements ActionListener {
     private void checkCollision() {
 
         if (pos_y >= B_HEIGHT) {
-            inGame = false;
+            pos_y -= DOT_SIZE; //je reste à ma place (mur invisible)
         }
 
-        if (pos_y < 0) {
-            inGame = false;
+        if (pos_y < 0) {//arrivé en haut donc vérif si tous les coins ont été récup avant de passer au niveau suivant
+            if(coinCounter == 0)
+            {
+                nextLevel = true; //on passe au niveau 0 car plus aucune pièce
+            }
+            else
+            {
+                pos_y += DOT_SIZE;
+            }
         }
 
         if (pos_x >= B_WIDTH) {
-            inGame = false;
+            pos_x -= DOT_SIZE;
         }
 
         if (pos_x < 0) {
-            inGame = false;
+            pos_x += DOT_SIZE;
         }
         
-        if (!inGame) {
+        if (!inGame || nextLevel) {
             timer.stop();
+
         }
     }
     
     private int getRandomCoordinate() {
 
-        int r = (int) (Math.random() * RAND_POS);
-        return ((r * DOT_SIZE));
+        int randomCoordinate = (int) (Math.random() * RAND_POS);
+        return ((randomCoordinate * DOT_SIZE));
     }
 
     @Override
@@ -241,26 +267,30 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
+            if (key == KeyEvent.VK_LEFT) {
                 leftDirection = true;
+                rightDirection = false;
                 upDirection = false;
                 downDirection = false;
             }
 
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
+            if (key == KeyEvent.VK_RIGHT) {
                 rightDirection = true;
+                leftDirection = false;
                 upDirection = false;
                 downDirection = false;
             }
 
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
+            if (key == KeyEvent.VK_UP){
                 upDirection = true;
+                downDirection = false;
                 rightDirection = false;
                 leftDirection = false;
             }
 
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
+            if (key == KeyEvent.VK_DOWN) {
                 downDirection = true;
+                upDirection = false;
                 rightDirection = false;
                 leftDirection = false;
             }
