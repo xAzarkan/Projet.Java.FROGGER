@@ -6,10 +6,8 @@ public abstract class FixedGameElement
     private int pos_y;
 
     public FixedGameElement(int pos_x, int pos_y) {
-        
         this.pos_x = pos_x ;
         this.pos_y = pos_y ;
-   
     }
     
     public int getPosX(){

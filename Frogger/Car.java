@@ -1,5 +1,3 @@
-import java.awt.Rectangle;
-
 public abstract class Car
 {
     private int pos_x;
@@ -36,13 +34,13 @@ public abstract class Car
     public void triggerAction(Board board){
         board.setInGameToFalse(); //peu importe la voiture que je touche --> game over
     }
-
+/*
     public void setImgDimensions(int imgWidth, int imgHeight)
     {
         this.imgWidth = imgWidth;
         this.imgHeight = imgHeight;
     }
-
+*/
     public int getImgWidth()
     {
         return imgWidth;
@@ -51,10 +49,5 @@ public abstract class Car
     public int getImgHeight()
     {
         return imgHeight;
-    }
-
-    public Rectangle getBounds() {
-        return new Rectangle(this.getPosX(), this.getPosY(), this.getImgWidth(), this.getImgHeight());
-    }
-    
+    } 
 }

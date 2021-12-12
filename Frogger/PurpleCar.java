@@ -6,6 +6,9 @@ public class PurpleCar extends Car
         super(pos_x, pos_y);
     }
 
+    public static String getPathToImage(){
+        return "purpleCar.png";
+    }
 
     public String getCarType(){
         return "purpleCar";
@@ -14,20 +17,18 @@ public class PurpleCar extends Car
     public void moveCar(Board b)
     {
          posCar_x = this.getPosX();
+         int coinCounter = b.getCoinCounter(); 
 
-         if(posCar_x < b.getWidth())
-         {
-             posCar_x += b.getDotSize(); 
+         if(posCar_x < b.getWidth()){
+            if(coinCounter > 0) // pour éviter de diviser par 0
+                posCar_x += b.getDotSize()/coinCounter; 
+            else
+                posCar_x += b.getDotSize()*2; 
          }
-         else
-         {
-             posCar_x = 0;
-         }
+         else //limite du terrain
+            posCar_x = 0;
+         
 
          this.setPosX(posCar_x);
-    }
-
-    public void triggerAction(Board board){
-        board.setInGameToFalse(); //peu importe la voiture que je touche --> game over
     }
 }

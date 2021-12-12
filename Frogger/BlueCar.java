@@ -22,7 +22,7 @@ public class BlueCar extends Car
 
         if(posCar_x > 0)
         {
-            if(b.getPosFroggerY() == posCar_y) //si le joueur se trouve sur sa bande, la voiture ralenti
+            if(b.getFrog().getPosY() == posCar_y) //si le joueur se trouve sur sa bande, la voiture ralenti
                 posCar_x -= b.getDotSize()/3; //vitesse de base divisée par 3
             else
                 posCar_x -= b.getDotSize();
@@ -34,9 +34,5 @@ public class BlueCar extends Car
 
         this.setPosX(posCar_x);
         
-    }
-
-    public void triggerAction(Board board){
-        board.setInGameToFalse(); //peu importe la voiture que je touche --> game over
     }
 }

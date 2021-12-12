@@ -1,5 +1,3 @@
-import java.awt.Rectangle;
-
 public class Frog
 {
     private int pos_x;
@@ -20,9 +18,22 @@ public class Frog
         return pos_y;
     }
     
-    public void setPosX_Y(int new_posX, int new_posY){
-        pos_x = new_posX;
-        pos_y = new_posY;
+    public void setPosX(int new_pos){
+        pos_x = new_pos;
+    }
+    
+    public void setPosY(int new_pos){
+        pos_y = new_pos;
+    }
+
+    public int getImgWidth()
+    {
+        return imgWidth;
+    }
+
+    public int getImgHeight()
+    {
+        return imgHeight;
     }
     
     public String getType(){
@@ -33,7 +44,4 @@ public class Frog
         return "frogger2.png";
     }
 
-    public Rectangle getBounds() {
-        return new Rectangle(this.getPosX(), this.getPosY(), imgWidth, imgHeight);
-    }
 }
