@@ -2,6 +2,7 @@ public abstract class Car
 {
     private int pos_x;
     private int pos_y;
+    private int indexOfRoad;
     private int imgWidth = 25; 
     private int imgHeight = 20;
 
@@ -25,6 +26,14 @@ public abstract class Car
     
     public void setPosY(int new_pos){
         pos_y = new_pos;
+    }
+
+    public void setIndexOfRoad(int index){
+        indexOfRoad = index;
+    }
+    public int getIndexOfRoad()
+    {
+        return indexOfRoad;
     }
 
     public abstract void moveCar(Board b);

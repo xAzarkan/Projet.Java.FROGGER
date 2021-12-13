@@ -62,8 +62,10 @@ public class Trunk extends Car
     @Override
     public void triggerAction(Board board){
         //le frogger va se poser sur le tronc (même pos_x que le tronc)
-        System.out.println("COLLISION");
+        //System.out.println("COLLISION");
         //System.out.println("trunkNumber : ");
-        board.getFrog().setPosX(this.getPosX());
+        posCar_x = this.getPosX();
+        //System.out.println("position Tronc : " + this.getPosX());
+        board.getFrog().setPosX(posCar_x);
     }
 }

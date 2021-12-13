@@ -162,8 +162,11 @@ public class Board extends JPanel implements ActionListener {
                     carList.add(new PurpleCar(posCar_x, posCar_y));
                 
                 else if(carListSize % 3 == 0)
-                    carList.add(new RedCar(posCar_x, posCar_y));
-                
+                {
+                    RedCar redCar = new RedCar(posCar_x, posCar_y);
+                    carList.add(redCar);
+                    redCar.setIndexOfRoad(i); //je lui donne l'emplacement dans le tableau de la route où la voiture rouge se trouve
+                }
                 else
                     carList.add(new OrangeCar(posCar_x, posCar_y));
                  
@@ -280,6 +283,19 @@ public class Board extends JPanel implements ActionListener {
         }        
     }
 
+
+    public int[] getRoadTab()
+    {
+        int[] roadTab = new int[roadForLevel[0].length];
+
+        for(int col = 0; col < roadForLevel[0].length; col++)
+        {
+            roadTab[col] = roadForLevel[levelNumber][col];
+        }
+
+        return roadTab;
+    }
+
     public void setInGameToFalse()
     {
         inGame = false;
@@ -287,7 +303,6 @@ public class Board extends JPanel implements ActionListener {
 
     private void goToNextLevel()
     {
-        
         System.out.println("Level " + levelNumber + " completed !");
         System.out.println("Your score : " + score);
         nextLevel = false;
@@ -305,7 +320,8 @@ public class Board extends JPanel implements ActionListener {
     }
     public Frog getFrog()
     {
-        return frog;
+        //System.out.println("CHANGEMENT POS X FROG");
+        return this.frog;
     }
     private void endGame(Graphics g) {
 
