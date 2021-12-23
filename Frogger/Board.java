@@ -24,20 +24,25 @@ public class Board extends JPanel implements ActionListener {
     private final int DELAY = 140;
     private final int GAME_BEGINNING_X = B_WIDTH/2;
     private final int GAME_BEGINNING_Y = B_HEIGHT - DOT_SIZE;
+    private final int LIMIT_TO_NEXT_LEVEL = DOT_SIZE;
 
     private int roadWidth = B_WIDTH;
     private int roadHeight = DOT_SIZE;
     private int roadPos_x = 0;
-    private int roadPos_y = DOT_SIZE;
+    private int roadPos_y = 0;
+   
 
     private int pos_x;
     private int pos_y;
 
     private int posCar_x = 0; 
     private int posCar_y = 0;
+    private int posCoin_x;
+    private int posCoin_y;
+    private int posInsect_x;
+    private int posInsect_y;
     
     private int coinCounter;
-    private int insectCounter;
     private int roadCounter;
     private int lastLevel = 2;
     private int levelNumber = 0;
@@ -46,13 +51,16 @@ public class Board extends JPanel implements ActionListener {
 
     private ArrayList<FixedGameElement> fixedGameElementList;
     private ArrayList<Car> carList;
+    private int carListSize;
 
     private static final Color WATER_COLOR = new Color(51,204,255);
     private static final Color GRASS_COLOR = new Color(0,153,0);
     private static final Color ROAD_COLOR = Color.gray;
     private static final Color BORDER_ROAD_COLOR = Color.black;
+    private static final Color GAME_OVER_COLOR = Color.red;
+    private static final Color SUCCESS_ENDGAME_COLOR = Color.green;
 
-    private Frog frog = new Frog(pos_x, pos_y);
+    private Frog frog;
     private Rectangle elemRec;
     private Rectangle frogRec;
 
@@ -68,7 +76,9 @@ public class Board extends JPanel implements ActionListener {
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private HashMap<String, ImageIcon> carImageMap;
 
-    private int score = 0;
+    private int currentScore = 0;
+    private int highScore = 0;
+    
     private int void_x = -1 * B_WIDTH; //position du "vide"
     private int void_y = -1 * B_HEIGHT; //je vais y mettre les objets que je souhaite faire disparaitre
 
@@ -76,9 +86,9 @@ public class Board extends JPanel implements ActionListener {
     private int grass = 1;
     private int water = 2;
 
-    private int[][] roadForLevel = {{0,0,0,1,0,0,1,1,0,0,0,0,2,2,0,0,0,1},  //niveau 0 --> les 0 représentent les routes, les 1 représentent les espaces, les 2 représentent l'eau
-                                    {0,0,0,0,1,1,0,0,0,0,1,1,1,0,0,1,0,1},  //niveau 1
-                                    {0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,1}}; //niveau 2
+    private int[][] roadForLevel = {{1,1,0,0,0,1,0,0,1,1,0,0,0,0,2,2,0,0,0,1},  //niveau 0 --> les 0 représentent les routes, les 1 représentent les espaces, les 2 représentent l'eau
+                                    {1,1,0,0,0,0,1,1,0,2,2,0,1,1,1,0,0,0,0,1},  //niveau 1
+                                    {1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,1}}; //niveau 2
     public Board() {   
         initBoard();
     }
@@ -102,8 +112,14 @@ public class Board extends JPanel implements ActionListener {
         ImageIcon iic = new ImageIcon(Coin.getPathToImage()); //image du coin
         fixedGameElementImageMap.put("coin", iic); //je n'utilise pas la méthode getType() car ce n'est pas une classe static
 
-        ImageIcon iii = new ImageIcon(Insect.getPathToImage()); //image de la pomme (voir dans Apple.java)
-        fixedGameElementImageMap.put("insect", iii);
+        ImageIcon iiredinsect = new ImageIcon(redInsect.getPathToImage()); //type 1 : insecte rouge
+        fixedGameElementImageMap.put("redInsect", iiredinsect);
+
+        ImageIcon iiblueinsect = new ImageIcon(blueInsect.getPathToImage()); //type 2 : insecte bleu
+        fixedGameElementImageMap.put("blueInsect", iiblueinsect);
+
+        ImageIcon iiyellowinsect = new ImageIcon(yellowInsect.getPathToImage()); //type 1 : insecte jaune
+        fixedGameElementImageMap.put("yellowInsect", iiyellowinsect);
 
         ImageIcon iiredcar = new ImageIcon(RedCar.getPathToImage());
         carImageMap.put("redCar", iiredcar);
@@ -126,13 +142,14 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() { //initialisation du jeu
 
+        frog = new Frog(pos_x, pos_y);
+
         pos_x = GAME_BEGINNING_X;
         pos_y = GAME_BEGINNING_Y;
 
         posCar_y = roadPos_y;
 
         coinCounter = 3 + levelNumber; //nombre de coins (+ le numéro de level)
-        insectCounter = 2; // 2 insectes au début du jeu
         roadCounter = roadForLevel[0].length - 1; //nombre de colonnes du tableau
 
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -140,18 +157,42 @@ public class Board extends JPanel implements ActionListener {
 
         //---PLACEMENT ALEATOIRE DES 3 COINS----//
         for(int i = 0; i < coinCounter ; i++){
-            fixedGameElementList.add(new Coin(getRandomCoordinate(), getRandomCoordinate()));
+            posCoin_x = getRandomCoordinate();
+            posCoin_y = getRandomCoordinate();
+
+            if(posCoin_y == 0) //pour éviter d'aller dans la zone où se trouve les pv et le score
+            {
+                posCoin_y += DOT_SIZE;
+            }
+
+            fixedGameElementList.add(new Coin(posCoin_x, posCoin_y));
         }
 
-        //---PLACEMENT ALEATOIRE DES 2 INSECTES---//
+        //---PLACEMENT ALEATOIRE DES 3 INSECTES---//
 
-        for(int i = 0; i < insectCounter ; i++){
-            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate()));
+        for(int i = 0; i < 3; i++)
+        {
+            posInsect_x = getRandomCoordinate();
+            posInsect_y = getRandomCoordinate();
+
+            if(posInsect_y == 0)
+            {
+                posInsect_y += DOT_SIZE;
+            }
+
+            if(i == 0)    
+                fixedGameElementList.add(new redInsect(posInsect_x, posInsect_y));
+            else if(i == 1)
+                fixedGameElementList.add(new blueInsect(posInsect_x, posInsect_y));
+            else
+                fixedGameElementList.add(new yellowInsect(posInsect_x, posInsect_y));
         }
+        
+    
 
         //---PLACEMENT DES VOITURES SUR LA ROUTE---//
 
-        int carListSize = carList.size();
+        carListSize = carList.size();
 
         for(int i = 0; i < roadCounter; i++){
             posCar_x = getRandomPositionCarX();
@@ -237,16 +278,22 @@ public class Board extends JPanel implements ActionListener {
         super.paintComponent(g);
 
         initLevel(g);
-
+        
         doDrawing(g);
     }
 
     private void initLevel(Graphics g) //Initialisation des niveaux (routes, etc...)
     {
         //placement des routes (dépend du levelNumber)
+
         for(int i = 0; i < roadForLevel[0].length; i++)
         {
-            if(roadForLevel[levelNumber][i] == road) //route
+            if(i == 0)
+            {
+                g.setColor(Color.black);
+                g.fillRect(roadPos_x, roadPos_y + (i*DOT_SIZE), roadWidth, roadHeight);
+            }
+            else if(roadForLevel[levelNumber][i] == road) //route
             {
                 g.setColor(ROAD_COLOR);
                 g.fillRect(roadPos_x, roadPos_y + (i*DOT_SIZE), roadWidth, roadHeight); //insertion des voies
@@ -259,6 +306,9 @@ public class Board extends JPanel implements ActionListener {
                 g.setColor(WATER_COLOR);
                 g.fillRect(roadPos_x, roadPos_y + (i*DOT_SIZE), roadWidth, roadHeight); //insertion des voies
             }
+            //---------- banniere avec les pv et le score ----------//
+            
+            //------------------------------------------------------//
         }    
     }
 
@@ -270,7 +320,7 @@ public class Board extends JPanel implements ActionListener {
             {
                 if(levelNumber == lastLevel) //si j'arrive au dernier niveau fin du jeu
                 {
-                    endGame(g);
+                    endGame(g, "Super ! Vous avez fini le jeu :)", SUCCESS_ENDGAME_COLOR);
                 }
                 else //sinon on va au niveau suivant
                 {
@@ -298,7 +348,7 @@ public class Board extends JPanel implements ActionListener {
         }
         else {
             clearRoad(g);
-            gameOver(g);
+            endGame(g, "Game over", GAME_OVER_COLOR);
         }        
     }
 
@@ -310,10 +360,9 @@ public class Board extends JPanel implements ActionListener {
     private void goToNextLevel()
     {
         System.out.println("Level " + levelNumber + " completed !");
-        System.out.println("Your score : " + score);
+        System.out.println("Your score : " + currentScore);
         nextLevel = false;
         levelNumber += 1;
-        insectCounter = 3;
         roadCounter = 0;
         blueCarCounter = 0;
         trunkNumber = 0;
@@ -325,39 +374,26 @@ public class Board extends JPanel implements ActionListener {
         g.clearRect(0, 0, B_WIDTH, B_HEIGHT);
     }
     
-    // !!!!!!!!! ATTENTION ICI DUPLICATION A REGLER !!!!!!!!! //
+    private void endGame(Graphics g, String messageToShow, Color color) {
 
-    private void endGame(Graphics g) {
-
-        String msg = "Super ! Vous avez fini le jeu :)";
         Font small = new Font("Helvetica", Font.BOLD, 22);
         FontMetrics metr = getFontMetrics(small);
 
+        String messageFinalScore = "Your final score : " + currentScore;
+
         g.setColor(Color.black);
         g.fillRect(0, 0, B_WIDTH, B_HEIGHT); //0 et 0 = début du rectangle
-        g.setColor(Color.green);
+        g.setColor(color);
         g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        g.drawString(messageToShow, (B_WIDTH - metr.stringWidth(messageToShow)) / 2, B_HEIGHT / 2);
+        int espaceEntreMessages = 50;
+        g.drawString(messageFinalScore, (B_WIDTH - metr.stringWidth(messageFinalScore)) / 2, B_HEIGHT / 2 + espaceEntreMessages);
+
     }
-
-    private void gameOver(Graphics g) {
-
-        String msg = "Game Over";
-        Font small = new Font("Helvetica", Font.BOLD, 14);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.black);
-        g.fillRect(0, 0, B_WIDTH, B_HEIGHT);
-        g.setColor(Color.red);
-        g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
-    }
-
-    // --------- FIN DUPLICATION -------------- //
 
     public void incScore(int valueToIncrease)
     {
-        score += valueToIncrease;
+        currentScore += valueToIncrease;
     }
 
     public void decreaseCoinAmount()
@@ -369,7 +405,6 @@ public class Board extends JPanel implements ActionListener {
 
         if (leftDirection && pos_x - DOT_SIZE >= 0) {
             pos_x -= DOT_SIZE;
-            
         }
 
         if (rightDirection && pos_x + DOT_SIZE < B_WIDTH) {
@@ -377,7 +412,7 @@ public class Board extends JPanel implements ActionListener {
         }
 
         if (upDirection) {
-            if(pos_y - DOT_SIZE < 0)//arrivé en haut donc vérif si tous les coins ont été récup avant de passer au niveau suivant
+            if(pos_y - DOT_SIZE < LIMIT_TO_NEXT_LEVEL)//arrivé en haut donc vérif si tous les coins ont été récup avant de passer au niveau suivant
             {
                 if(coinCounter == 0)
                 {
@@ -390,7 +425,7 @@ public class Board extends JPanel implements ActionListener {
             }
         }
 
-        if (downDirection && pos_y+DOT_SIZE < B_HEIGHT) {
+        if (downDirection && pos_y + DOT_SIZE < B_HEIGHT) {
             pos_y += DOT_SIZE;
         }
     }

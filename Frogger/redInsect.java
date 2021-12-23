@@ -1,14 +1,15 @@
-public class Insect extends FixedGameElement
+public class redInsect extends FixedGameElement
 {
-    public Insect(int pos_x, int pos_y) {
+    public redInsect(int pos_x, int pos_y) {
         super(pos_x, pos_y);
     }
+    
     public static String getPathToImage(){
-        return "insect.png";
+        return "redInsect.png";
     }
 
     public String getType(){
-        return "insect";
+        return "redInsect";
     }
 
     public void triggerAction(Board board){
