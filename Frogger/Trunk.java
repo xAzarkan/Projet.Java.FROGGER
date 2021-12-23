@@ -1,11 +1,7 @@
 public class Trunk extends Car
 {
-    private int posCar_x;
-    private int posCar_y;
     private int trunkNumber;
-    private int imgWidth = 50;
-    private int imgHeight = 20;
-
+    
     public Trunk(int pos_x, int pos_y) {
         super(pos_x, pos_y);
     }
@@ -31,7 +27,6 @@ public class Trunk extends Car
     public void moveCar(Board b)
     {  
         posCar_x = this.getPosX();
-        //posCar_y = this.getPosY();
 
         if(trunkNumber % 2 == 0)
         {
@@ -62,10 +57,7 @@ public class Trunk extends Car
     @Override
     public void triggerAction(Board board){
         //le frogger va se poser sur le tronc (même pos_x que le tronc)
-        //System.out.println("COLLISION");
-        //System.out.println("trunkNumber : ");
         posCar_x = this.getPosX();
-        //System.out.println("position Tronc : " + this.getPosX());
         board.getFrog().setPosX(posCar_x);
     }
 }

@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,6 +49,8 @@ public class Board extends JPanel implements ActionListener {
 
     private static final Color WATER_COLOR = new Color(51,204,255);
     private static final Color GRASS_COLOR = new Color(0,153,0);
+    private static final Color ROAD_COLOR = Color.gray;
+    private static final Color BORDER_ROAD_COLOR = Color.black;
 
     private Frog frog = new Frog(pos_x, pos_y);
     private Rectangle elemRec;
@@ -70,6 +71,10 @@ public class Board extends JPanel implements ActionListener {
     private int score = 0;
     private int void_x = -1 * B_WIDTH; //position du "vide"
     private int void_y = -1 * B_HEIGHT; //je vais y mettre les objets que je souhaite faire disparaitre
+
+    private int road = 0;
+    private int grass = 1;
+    private int water = 2;
 
     private int[][] roadForLevel = {{0,0,0,1,0,0,1,1,0,0,0,0,2,2,0,0,0,1},  //niveau 0 --> les 0 représentent les routes, les 1 représentent les espaces, les 2 représentent l'eau
                                     {0,0,0,0,1,1,0,0,0,0,1,1,1,0,0,1,0,1},  //niveau 1
@@ -117,18 +122,16 @@ public class Board extends JPanel implements ActionListener {
 
         ImageIcon iifrog = new ImageIcon(Frog.getPathToImage());
         fixedGameElementImageMap.put("frog", iifrog);
-
     }
 
-    private void initGame() {
+    private void initGame() { //initialisation du jeu
 
         pos_x = GAME_BEGINNING_X;
         pos_y = GAME_BEGINNING_Y;
 
-        //posCar_x = DOT_SIZE;
         posCar_y = roadPos_y;
 
-        coinCounter = 3 + levelNumber; //nombre de coins
+        coinCounter = 3 + levelNumber; //nombre de coins (+ le numéro de level)
         insectCounter = 2; // 2 insectes au début du jeu
         roadCounter = roadForLevel[0].length - 1; //nombre de colonnes du tableau
 
@@ -152,13 +155,13 @@ public class Board extends JPanel implements ActionListener {
 
         for(int i = 0; i < roadCounter; i++){
             posCar_x = getRandomPositionCarX();
-            if(roadForLevel[levelNumber][i] == 0){ //donc je dois placer une voiture car il y'a une route
+            if(roadForLevel[levelNumber][i] == road){ //donc je dois placer une voiture car il y'a une route
                 if(carListSize % 2 == 0 && blueCarCounter < 2)
                 {
                     carList.add(new BlueCar(posCar_x, posCar_y));
                     blueCarCounter += 1;
                 }
-                else if(carListSize % 2 == 0)
+                else if(carListSize % 2 == 0) //expliquer la logique
                     carList.add(new PurpleCar(posCar_x, posCar_y));
                 
                 else if(carListSize % 3 == 0)
@@ -172,7 +175,7 @@ public class Board extends JPanel implements ActionListener {
                  
                 carListSize = carList.size();
             }
-            else if(roadForLevel[levelNumber][i] == 2)
+            else if(roadForLevel[levelNumber][i] == water)
             { //je dois placer un tronc d'arbre car je suis sur la riviere
                     Trunk trunk = new Trunk(posCar_x, posCar_y);
                     carList.add(trunk);
@@ -194,18 +197,41 @@ public class Board extends JPanel implements ActionListener {
         timer.start();
     }
 
+    // --- GETTEUR DU BOARD POUR LES AUTRES CLASSES --- //
+
     public int getTrunkNumber()
     { //va servir pour la classe Trunk
         return trunkNumber;
     }
 
-    private int getRandomPositionCarX()
+    public int[] getRoadTab()
     {
-        //on génère une position n'importe où sur la largeur --> pour que les voitures ne démarrent pas toutes au même endroit
-        int randomPositionCarX = (int) (Math.random() * B_WIDTH); 
-        return (randomPositionCarX);
+        int[] roadTab = new int[roadForLevel[0].length];
+
+        for(int col = 0; col < roadForLevel[0].length; col++)
+        {
+            roadTab[col] = roadForLevel[levelNumber][col];
+        }
+        return roadTab;
     }
 
+    public Frog getFrog()
+    {
+        return this.frog;
+    }
+
+    public int getCoinCounter()
+    {
+        return coinCounter;
+    }
+
+    public int getDotSize()
+    {
+        return DOT_SIZE;
+    }
+
+    // ------------------------------------------------ //
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -215,31 +241,24 @@ public class Board extends JPanel implements ActionListener {
         doDrawing(g);
     }
 
-    public int getDotSize()
-    {
-        return DOT_SIZE;
-    }
-
-    private void initLevel(Graphics g)
+    private void initLevel(Graphics g) //Initialisation des niveaux (routes, etc...)
     {
         //placement des routes (dépend du levelNumber)
         for(int i = 0; i < roadForLevel[0].length; i++)
         {
-            if(roadForLevel[levelNumber][i] == 0) //route
+            if(roadForLevel[levelNumber][i] == road) //route
             {
-                g.setColor(Color.gray);
+                g.setColor(ROAD_COLOR);
                 g.fillRect(roadPos_x, roadPos_y + (i*DOT_SIZE), roadWidth, roadHeight); //insertion des voies
     
-                g.setColor(Color.black);
+                g.setColor(BORDER_ROAD_COLOR);
                 g.drawRect(roadPos_x - 1, roadPos_y + (i*DOT_SIZE), roadWidth + 1, roadHeight); //bordure des voies
             }
-
-            else if(roadForLevel[levelNumber][i] == 2) //rivière
+            else if(roadForLevel[levelNumber][i] == water) //rivière
             {
                 g.setColor(WATER_COLOR);
                 g.fillRect(roadPos_x, roadPos_y + (i*DOT_SIZE), roadWidth, roadHeight); //insertion des voies
             }
-            
         }    
     }
 
@@ -253,7 +272,7 @@ public class Board extends JPanel implements ActionListener {
                 {
                     endGame(g);
                 }
-                else
+                else //sinon on va au niveau suivant
                 {
                     clearRoad(g);
                     goToNextLevel();
@@ -273,7 +292,7 @@ public class Board extends JPanel implements ActionListener {
                 frog.setPosX(pos_x);
                 frog.setPosY(pos_y);
                 g.drawImage(fixedGameElementImageMap.get(frog.getType()).getImage(), frog.getPosX(), frog.getPosY(), this);
-    
+                
                 Toolkit.getDefaultToolkit().sync();
             }
         }
@@ -281,19 +300,6 @@ public class Board extends JPanel implements ActionListener {
             clearRoad(g);
             gameOver(g);
         }        
-    }
-
-
-    public int[] getRoadTab()
-    {
-        int[] roadTab = new int[roadForLevel[0].length];
-
-        for(int col = 0; col < roadForLevel[0].length; col++)
-        {
-            roadTab[col] = roadForLevel[levelNumber][col];
-        }
-
-        return roadTab;
     }
 
     public void setInGameToFalse()
@@ -318,11 +324,9 @@ public class Board extends JPanel implements ActionListener {
     {
         g.clearRect(0, 0, B_WIDTH, B_HEIGHT);
     }
-    public Frog getFrog()
-    {
-        //System.out.println("CHANGEMENT POS X FROG");
-        return this.frog;
-    }
+    
+    // !!!!!!!!! ATTENTION ICI DUPLICATION A REGLER !!!!!!!!! //
+
     private void endGame(Graphics g) {
 
         String msg = "Super ! Vous avez fini le jeu :)";
@@ -330,7 +334,7 @@ public class Board extends JPanel implements ActionListener {
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.black);
-        g.fillRect(0, 0, B_WIDTH, B_HEIGHT);
+        g.fillRect(0, 0, B_WIDTH, B_HEIGHT); //0 et 0 = début du rectangle
         g.setColor(Color.green);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
@@ -349,26 +353,7 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 
-    private void checkGameElementCollision() {
-
-        for(FixedGameElement elem: fixedGameElementList){
-            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())){
-                elem.setPosX(void_x); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
-                elem.setPosY(void_y); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
-
-                elem.triggerAction(this);
-
-                System.out.println(coinCounter);
-                System.out.println(score);
-            }
-        }
-           
-    }
-
-    public int getCoinCounter()
-    {
-        return coinCounter;
-    }
+    // --------- FIN DUPLICATION -------------- //
 
     public void incScore(int valueToIncrease)
     {
@@ -410,7 +395,20 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    public void checkCollision() {
+    //--------- checkCollision ------//
+
+    private void checkCollision() {
+
+        for(FixedGameElement elem: fixedGameElementList){
+            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())){
+                elem.setPosX(void_x); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
+                elem.setPosY(void_y); //on déplace la coin dans le "vide" pour la faire disparaitre de l'écran
+
+                elem.triggerAction(this);
+            }
+        }
+
+        //--- rectangle collision ---//
 
         frogRec.setBounds(frog.getPosX(), frog.getPosY(), frog.getImgWidth(), frog.getImgHeight());
 
@@ -424,24 +422,36 @@ public class Board extends JPanel implements ActionListener {
             }
         }
 
+        //--- end rectangle collision ---//
+
         if (!inGame || nextLevel) //si fin du jeu ou niveau suivant
         {
             timer.stop();
         }
     }
-    
-    private int getRandomCoordinate() {
 
+    //--------- fin checkCollision ------//
+
+    // -------- getRandomCoordinate / Position ------- //
+    
+    private int getRandomCoordinate() { //position random pour les élements fixes
         int randomCoordinate = (int) (Math.random() * RAND_POS);
         return ((randomCoordinate * DOT_SIZE));
     }
 
+    private int getRandomPositionCarX() 
+    {//on génère une position n'importe où sur la largeur --> pour que les voitures ne démarrent pas toutes au même endroit   
+        int randomPositionCarX = (int)(Math.random() * B_WIDTH); 
+        return (randomPositionCarX);
+    }
+
+    // ------- FIN RANDOM -------- //
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (inGame) {
-
-            checkGameElementCollision();
+        if (inGame) 
+        {
             checkCollision();
         }
         repaint();
@@ -481,10 +491,7 @@ public class Board extends JPanel implements ActionListener {
                 rightDirection = false;
                 leftDirection = false;
             }
-
             move();
-            
-            
         }
            
     }

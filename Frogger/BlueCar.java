@@ -1,8 +1,5 @@
 public class BlueCar extends Car
 {
-    private int posCar_x;
-    private int posCar_y;
-
     public BlueCar(int pos_x, int pos_y) {
         super(pos_x, pos_y);
     }
@@ -15,17 +12,17 @@ public class BlueCar extends Car
         return "blueCar";
     }    
 
-    public void moveCar(Board b)
-    {  
+    public void moveCar(Board b) //méthode qui fait bouger la voiture
+    {
         posCar_x = this.getPosX();
         posCar_y = this.getPosY();
 
         if(posCar_x > 0)
         {
             if(b.getFrog().getPosY() == posCar_y) //si le joueur se trouve sur sa bande, la voiture ralenti
-                posCar_x -= b.getDotSize()/3; //vitesse de base divisée par 3
+                posCar_x -= normalSpeed / 3; //vitesse de base divisée par 3
             else
-                posCar_x -= b.getDotSize();
+                posCar_x -= normalSpeed;
         }
         else
         {

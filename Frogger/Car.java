@@ -1,11 +1,14 @@
 public abstract class Car
 {
-    private int pos_x;
-    private int pos_y;
-    private int indexOfRoad;
-    private int imgWidth = 25; 
-    private int imgHeight = 20;
-
+    protected int pos_x;
+    protected int pos_y;
+    protected int posCar_x;
+    protected int posCar_y;
+    protected int indexOfRoad;
+    protected int normalSpeed  = 20;
+    
+    protected int imgWidth = 25; //largeur de ma voiture 
+    protected int imgHeight = 20; //hauteur de ma voiture
 
     public Car(int pos_x, int pos_y) {
         this.pos_x = pos_x;
@@ -31,8 +34,7 @@ public abstract class Car
     public void setIndexOfRoad(int index){
         indexOfRoad = index;
     }
-    public int getIndexOfRoad()
-    {
+    public int getIndexOfRoad(){
         return indexOfRoad;
     }
 
@@ -43,20 +45,12 @@ public abstract class Car
     public void triggerAction(Board board){
         board.setInGameToFalse(); //peu importe la voiture que je touche --> game over
     }
-/*
-    public void setImgDimensions(int imgWidth, int imgHeight)
-    {
-        this.imgWidth = imgWidth;
-        this.imgHeight = imgHeight;
-    }
-*/
-    public int getImgWidth()
-    {
+
+    public int getImgWidth(){
         return imgWidth;
     }
 
-    public int getImgHeight()
-    {
+    public int getImgHeight(){
         return imgHeight;
     } 
 }

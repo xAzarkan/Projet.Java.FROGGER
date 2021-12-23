@@ -1,7 +1,5 @@
 public class OrangeCar extends Car
 {
-    private int posCar_x;
-
     public OrangeCar(int pos_x, int pos_y) {
         super(pos_x, pos_y);
     }
@@ -27,11 +25,11 @@ public class OrangeCar extends Car
         {
             if(randomSpeed == slow)
             {
-                posCar_x -= b.getDotSize()/3;
+                posCar_x -= normalSpeed/3;
             }
             else
             {
-                posCar_x -= b.getDotSize()*2;
+                posCar_x -= normalSpeed*2;
             }
         }
         else
