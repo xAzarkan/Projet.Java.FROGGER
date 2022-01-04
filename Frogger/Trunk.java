@@ -1,63 +1,36 @@
-public class Trunk extends Car
+public class Trunk
 {
-    private int trunkNumber;
-    
+    private int pos_x;
+    private int pos_y;
+
+
     public Trunk(int pos_x, int pos_y) {
-        super(pos_x, pos_y);
+        this.pos_x = pos_x;
+        this.pos_y = pos_y;
     }
 
     public static String getPathToImage(){
         return "trunk.png";
     }
 
-    public String getCarType(){
+    public String getType(){
         return "trunk";
     }
 
-    public void setTrunkNumber(int trunkNumber)
-    {
-        this.trunkNumber = trunkNumber;
+    public int getPosX(){
+        return pos_x;
     }
-
-    public int getTrunkNumber()
-    {
-        return this.trunkNumber;
-    }
-
-    public void moveCar(Board b)
-    {  
-        posCar_x = this.getPosX();
-
-        if(trunkNumber % 2 == 0)
-        {
-            if(posCar_x > 0)
-            {
-                posCar_x -= b.getDotSize()/3;
-            }
-            else
-            {
-                posCar_x = b.getWidth();
-            }
-        }
-        else
-        {
-            if(posCar_x < b.getWidth())
-            {
-                posCar_x += b.getDotSize()/3;
-            }
-            else
-            {
-                posCar_x = 0;
-            }
-        }   
     
-        this.setPosX(posCar_x);    
+    public int getPosY(){
+        return pos_y;
     }
-
-    @Override
-    public void triggerAction(Board board){
-        //le frogger va se poser sur le tronc (même pos_x que le tronc)
-        posCar_x = this.getPosX();
-        board.getFrog().setPosX(posCar_x);
+    
+    public void setPosX(int new_pos){
+        pos_x = new_pos;
     }
+    
+    public void setPosY(int new_pos){
+        pos_y = new_pos;
+    }
+    
 }

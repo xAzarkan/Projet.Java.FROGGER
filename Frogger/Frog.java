@@ -41,7 +41,11 @@ public class Frog
     }
 
     public static String getPathToImage(){
-        return "frogger2.png";
+        return "frogger.png";
+    }
+
+    public static String getPathToImageInvincible(){
+        return "invinciblefrogger.png";
     }
 
 }
