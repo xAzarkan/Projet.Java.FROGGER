@@ -40,11 +40,11 @@ public class Frog
         return "frog";
     }
 
-    public static String getPathToImage(){
+    public static String getPathToImage(){//image normal de frogger
         return "frogger.png";
     }
 
-    public static String getPathToImageInvincible(){
+    public static String getPathToImageInvincible(){//si frogger est en mode invincible
         return "invinciblefrogger.png";
     }
 

@@ -14,6 +14,7 @@ import javax.swing.Timer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Rectangle;
+import java.io.*;
 
 
 public class Board extends JPanel implements ActionListener {
@@ -148,6 +149,7 @@ public class Board extends JPanel implements ActionListener {
 
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
+        getHighScore();
         initGame();
     }
 
@@ -160,13 +162,13 @@ public class Board extends JPanel implements ActionListener {
         ImageIcon iic = new ImageIcon(Coin.getPathToImage()); //image du coin
         fixedGameElementImageMap.put("coin", iic); //je n'utilise pas la méthode getType() car ce n'est pas une classe static
 
-        ImageIcon iiredinsect = new ImageIcon(redInsect.getPathToImage()); //type 1 : insecte rouge
+        ImageIcon iiredinsect = new ImageIcon(RedInsect.getPathToImage()); //type 1 : insecte rouge
         fixedGameElementImageMap.put("redInsect", iiredinsect);
 
-        ImageIcon iiblueinsect = new ImageIcon(blueInsect.getPathToImage()); //type 2 : insecte bleu
+        ImageIcon iiblueinsect = new ImageIcon(BlueInsect.getPathToImage()); //type 2 : insecte bleu
         fixedGameElementImageMap.put("blueInsect", iiblueinsect);
 
-        ImageIcon iiyellowinsect = new ImageIcon(yellowInsect.getPathToImage()); //type 1 : insecte jaune
+        ImageIcon iiyellowinsect = new ImageIcon(YellowInsect.getPathToImage()); //type 1 : insecte jaune
         fixedGameElementImageMap.put("yellowInsect", iiyellowinsect);
 
         ImageIcon iiredcar = new ImageIcon(RedCar.getPathToImage());
@@ -198,8 +200,8 @@ public class Board extends JPanel implements ActionListener {
         ImageIcon iipill = new ImageIcon(Pill.getPathToImage());
         fixedGameElementImageMap.put("pill", iipill);
 
-        ImageIcon iigreenpill = new ImageIcon(BushPowerUpStar.getPathToImage());
-        fixedGameElementImageMap.put("bushpowerupstar", iigreenpill);
+        ImageIcon iigreenstar = new ImageIcon(BushPowerUpStar.getPathToImage());
+        fixedGameElementImageMap.put("bushpowerupstar", iigreenstar);
     }
 
     private void initGame() { //initialisation du jeu
@@ -299,11 +301,11 @@ public class Board extends JPanel implements ActionListener {
                 posInsect_y = getRandomCoordinate();
             }
             if(insectType == 0)
-                fixedGameElementList.add(new yellowInsect(posInsect_x, posInsect_y));
+                fixedGameElementList.add(new YellowInsect(posInsect_x, posInsect_y));
             else if(insectType == 1)
-                fixedGameElementList.add(new redInsect(posInsect_x, posInsect_y));
+                fixedGameElementList.add(new RedInsect(posInsect_x, posInsect_y));
             else
-                fixedGameElementList.add(new blueInsect(posInsect_x, posInsect_y));  
+                fixedGameElementList.add(new BlueInsect(posInsect_x, posInsect_y));  
         }
 
         //---PLACEMENT DE LA PILLULE---//
@@ -641,9 +643,50 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void setHighScore()
-    {//fonction permettant d'enregistrer le plus gros score de la session en cours
+    {//fonction permettant d'enregistrer le plus gros score jamais atteint
         if(currentScore > highScore)
             highScore = currentScore;
+
+        String stringHighScore = String.valueOf(highScore);
+
+        try 
+		{
+			FileWriter myWriter = new FileWriter("highscore.txt"); //j'ouvre le fichier.txt en écriture
+			
+            myWriter.write(stringHighScore); //écriture dans le fichier
+			
+			myWriter.close();
+			System.out.println("L'écriture s'est déroulée avec succès !");
+			
+		}
+		catch (IOException e)
+		{
+			System.out.println("Erreur lors de l'ouverture du fichier...");
+			e.printStackTrace();
+		}
+    }
+
+    private void getHighScore()
+    { //fonction permettant de récupérer le plus gros score enregistré sur le fichier text highscore.txt
+        //source : https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
+        try{
+            // Passing the path to the file as a parameter
+            File fileHighScore = new File("highScore.txt");
+
+            BufferedReader buffReader = new BufferedReader(new FileReader(fileHighScore));
+    
+            // Declaring a string variable
+            String stringHighScore;
+
+            while ((stringHighScore = buffReader.readLine()) != null)
+                highScore = Integer.parseInt(stringHighScore);
+        }
+        catch(IOException e)
+        {
+            System.out.println("Erreur lors de l'ouverture du fichier...");
+			e.printStackTrace();
+        }
+        
     }
 
     private void clearRoad(Graphics g)

@@ -1,6 +1,6 @@
-public class yellowInsect extends FixedGameElement{
+public class YellowInsect extends FixedGameElement{
 
-    public yellowInsect(int pos_x, int pos_y) {
+    public YellowInsect(int pos_x, int pos_y) {
         super(pos_x, pos_y);
     }
     

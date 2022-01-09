@@ -1,7 +1,5 @@
 public abstract class Car
 {
-    protected int pos_x;
-    protected int pos_y;
     protected int posCar_x;
     protected int posCar_y;
     protected int indexOfRoad;
@@ -12,31 +10,31 @@ public abstract class Car
     protected int imgWidth = 25; //largeur de ma voiture
     protected int imgHeight = 20; //hauteur de ma voiture
 
-    public Car(int pos_x, int pos_y) {
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
+    public Car(int posCar_x, int posCar_y) {
+        this.posCar_x = posCar_x;
+        this.posCar_y = posCar_y;
     }
 
     public int getPosX(){
-        return pos_x;
+        return posCar_x;
     }
     
     public int getPosY(){
-        return pos_y;
+        return posCar_y;
     }
     
     public void setPosX(int new_pos){
-        pos_x = new_pos;
+        posCar_x = new_pos;
     }
     
     public void setPosY(int new_pos){
-        pos_y = new_pos;
+        posCar_y = new_pos;
     }
 
     public void setIndexOfRoad(int index){
         indexOfRoad = index;
     }
-    public int getIndexOfRoad(){ //route où se trouve la voiture concernée
+    public int getIndexOfRoad(){ //index de la bande où se trouve la voiture concernée
         return indexOfRoad;
     }
 
