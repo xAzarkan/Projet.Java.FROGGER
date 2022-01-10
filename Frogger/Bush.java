@@ -7,7 +7,7 @@ public class Bush extends FixedGameElement{
 
     public static String getPathToImage()
     {
-        return "bush.png";
+        return "gameIcones/bush.png";
     }
 
     public String getType()

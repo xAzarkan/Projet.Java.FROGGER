@@ -6,7 +6,7 @@ public class BushPowerUpStar extends FixedGameElement
     }
     public static String getPathToImage()
     {
-        return "bushpowerup.png";
+        return "gameIcones/bushpowerup.png";
     }
 
     public String getType()

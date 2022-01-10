@@ -7,7 +7,7 @@ public class PurpleCar extends Car
     }
 
     public static String getPathToImage(){
-        return "purpleCar.png";
+        return "gameIcones/purpleCar.png";
     }
 
     public String getCarType(){

@@ -6,7 +6,7 @@ public class Pill extends FixedGameElement{
     }
     public static String getPathToImage()
     {
-        return "pill.png";
+        return "gameIcones/pill.png";
     }
 
     public String getType()

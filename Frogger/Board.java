@@ -191,7 +191,7 @@ public class Board extends JPanel implements ActionListener {
 
         iiinvinciblefrog = new ImageIcon(Frog.getPathToImageInvincible());
 
-        ImageIcon iiheart = new ImageIcon("heart.png");
+        ImageIcon iiheart = new ImageIcon("gameIcones/heart.png");
         fixedGameElementImageMap.put("heart", iiheart);
 
         ImageIcon iirock = new ImageIcon(Bush.getPathToImage());
@@ -382,7 +382,6 @@ public class Board extends JPanel implements ActionListener {
         if(positionOnY == riverPositionTabY[0] || positionOnY == riverPositionTabY[1])
             return true;
         
-
         return false;
     }
 
@@ -651,39 +650,32 @@ public class Board extends JPanel implements ActionListener {
 
         try 
 		{
-			FileWriter myWriter = new FileWriter("highscore.txt"); //j'ouvre le fichier.txt en écriture
+			FileWriter myFileWriter = new FileWriter("highscore.txt"); //j'ouvre le fichier.txt en écriture
 			
-            myWriter.write(stringHighScore); //écriture dans le fichier
+            myFileWriter.write(stringHighScore); //écriture dans le fichier
 			
-			myWriter.close();
-			System.out.println("L'écriture s'est déroulée avec succès !");
-			
+			myFileWriter.close();
 		}
 		catch (IOException e)
 		{
-			System.out.println("Erreur lors de l'ouverture du fichier...");
 			e.printStackTrace();
 		}
     }
 
     private void getHighScore()
     { //fonction permettant de récupérer le plus gros score enregistré sur le fichier text highscore.txt
-        //source : https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
         try{
-            // Passing the path to the file as a parameter
-            File fileHighScore = new File("highScore.txt");
+            File fileHighScore = new File("highscore.txt");
 
             BufferedReader buffReader = new BufferedReader(new FileReader(fileHighScore));
-    
-            // Declaring a string variable
+
             String stringHighScore;
 
             while ((stringHighScore = buffReader.readLine()) != null)
-                highScore = Integer.parseInt(stringHighScore);
+                highScore = Integer.parseInt(stringHighScore); //je convertis la chaine de caractère en entier
         }
         catch(IOException e)
         {
-            System.out.println("Erreur lors de l'ouverture du fichier...");
 			e.printStackTrace();
         }
         

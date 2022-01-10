@@ -10,7 +10,7 @@ public class Trunk
     }
 
     public static String getPathToImage(){
-        return "trunk.png";
+        return "gameIcones/trunk.png";
     }
 
     public String getType(){

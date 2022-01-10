@@ -5,7 +5,7 @@ public class BlueInsect extends FixedGameElement{
     }
 
     public static String getPathToImage(){
-        return "blueInsect.png";
+        return "gameIcones/blueInsect.png";
     }
 
     public String getType(){
@@ -13,8 +13,10 @@ public class BlueInsect extends FixedGameElement{
     }
 
     public void triggerAction(Board board){
+        int valueOfInsect = 1;
+
         this.setPosX(board.getVoid_x()); //on déplace coin ou l'insecte dans le "vide" pour la faire disparaitre de l'écran
         this.setPosY(board.getVoid_y());
-        board.incScore(1);
+        board.incScore(valueOfInsect);
     }
 }

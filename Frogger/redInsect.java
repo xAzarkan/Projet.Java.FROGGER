@@ -5,7 +5,7 @@ public class RedInsect extends FixedGameElement
     }
     
     public static String getPathToImage(){
-        return "redInsect.png";
+        return "gameIcones/redInsect.png";
     }
 
     public String getType(){
@@ -13,8 +13,10 @@ public class RedInsect extends FixedGameElement
     }
 
     public void triggerAction(Board board){
+        int valueOfInsect = 2;
+
         this.setPosX(board.getVoid_x()); //on déplace coin ou l'insecte dans le "vide" pour la faire disparaitre de l'écran
         this.setPosY(board.getVoid_y());
-        board.incScore(2); //augmente le score de 2 (dans Board)
+        board.incScore(valueOfInsect); //augmente le score de 2 (dans Board)
     }
 }
